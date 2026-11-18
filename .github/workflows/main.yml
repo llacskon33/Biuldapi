@@ -1,0 +1,38 @@
+name: Compilar APK Scrcpy para Android TV
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - main
+      - master
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Descargar el código
+        uses: actions/checkout@v4
+
+      - name: Preparar Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '11'
+
+      - name: Dar permisos a Gradle
+        run: chmod +x ./gradlew
+
+      - name: Compilar APK
+        run: ./gradlew --no-daemon :app:assembleScrcpyDebug
+
+      - name: Publicar APK
+        uses: actions/upload-artifact@v4
+        with:
+          name: scrcpy-android-tv-apk
+          path: app/build/outputs/apk/scrcpy/debug/*.apk
+          if-no-files-found: error
+          retention-days: 7
