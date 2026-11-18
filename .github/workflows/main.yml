@@ -1,3 +1,4 @@
+
 name: Compilar APK Scrcpy para Android TV
 
 on:
@@ -13,6 +14,7 @@ permissions:
 jobs:
   build:
     runs-on: ubuntu-latest
+
     steps:
       - name: Descargar el código
         uses: actions/checkout@v4
@@ -22,6 +24,19 @@ jobs:
         with:
           distribution: temurin
           java-version: '11'
+
+      - name: Comprobar archivos del proyecto
+        run: |
+          ls -la
+          if [ ! -f "./gradlew" ]; then
+            echo "ERROR: No se encuentra gradlew en la raíz."
+            echo "Debes subir el proyecto completo, no solamente el workflow."
+            exit 1
+          fi
+          if [ ! -d "./app" ]; then
+            echo "ERROR: No se encuentra la carpeta app."
+            exit 1
+          fi
 
       - name: Dar permisos a Gradle
         run: chmod +x ./gradlew
@@ -36,3 +51,4 @@ jobs:
           path: app/build/outputs/apk/scrcpy/debug/*.apk
           if-no-files-found: error
           retention-days: 7
+          
